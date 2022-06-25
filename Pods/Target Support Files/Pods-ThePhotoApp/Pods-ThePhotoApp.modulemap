@@ -1,0 +1,6 @@
+framework module Pods_ThePhotoApp {
+  umbrella header "Pods-ThePhotoApp-umbrella.h"
+
+  export *
+  module * { export * }
+}
