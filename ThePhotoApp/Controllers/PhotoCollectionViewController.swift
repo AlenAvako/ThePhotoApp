@@ -15,7 +15,7 @@ class PhotoCollectionViewController: UIViewController {
         let photoCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         photoCollection.translatesAutoresizingMaskIntoConstraints = false
         photoCollection.register(PhotoCollectionCell.self, forCellWithReuseIdentifier: String(describing: PhotoCollectionCell.self))
-        photoCollection.backgroundColor = .cyan
+        photoCollection.backgroundColor = .white
         photoCollection.alpha = 0
         return photoCollection
     }()
@@ -36,22 +36,17 @@ class PhotoCollectionViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func loadView() {
-        super.loadView()
-        
-        
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .cyan
+        view.backgroundColor = .white
         
         setUpSpinnerView()
         setUpCollectionView()
         setUpViewModel()
+        setupSearchBar()
         
-        viewModel.makeRequest()
+        viewModel.makeRequest(searchTerm: "Random")
     }
     
     private func setUpViewModel() {
@@ -105,15 +100,31 @@ class PhotoCollectionViewController: UIViewController {
             photoCollection.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
+    
+    private func setupSearchBar() {
+        let searchController = UISearchController(searchResultsController: nil)
+        navigationItem.searchController = searchController
+        searchController.searchBar.tintColor = UIColor(named: "AppGreen")
+        searchController.searchBar.delegate = self
+    }
+}
+
+extension PhotoCollectionViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let searchText = searchBar.text else { return }
+        viewModel.makeRequest(searchTerm: searchText)
+    }
 }
 
 extension PhotoCollectionViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel.photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = photoCollection.dequeueReusableCell(withReuseIdentifier: String(describing: PhotoCollectionCell.self), for: indexPath) as! PhotoCollectionCell
+        
+        cell.loadedPhoto = viewModel.photos[indexPath.item]
         
         return cell
     }
@@ -132,5 +143,11 @@ extension PhotoCollectionViewController: UICollectionViewDataSource {
 }
 
 extension PhotoCollectionViewController: UICollectionViewDelegateFlowLayout {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let id = viewModel.photos[indexPath.item].id
+        let viewModel = DetailViewModel(id: id)
+        let detailVC = PhotoDetailViewController(viewModel: viewModel)
+        detailVC.modalPresentationStyle = .fullScreen
+        present(detailVC, animated: true)
+    }
 }

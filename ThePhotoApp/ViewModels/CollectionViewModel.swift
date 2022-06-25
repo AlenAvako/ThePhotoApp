@@ -19,9 +19,9 @@ final class CollectionViewModel {
         }
     }
     
-    func makeRequest() {
+    func makeRequest(searchTerm: String) {
         state = .loading
-        NetworkService.shared.request(searchterm: "") { [weak self] photoArray in
+        NetworkService.shared.request(searchterm: searchTerm) { [weak self] photoArray in
             self?.photos = photoArray
             self?.state = .loaded
         }

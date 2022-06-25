@@ -9,14 +9,14 @@ import UIKit
 
 enum ViewControllers {
     case photoCollection(viewModel: CollectionViewModel)
-    case favoritePhotos(viewModel: TableViewModel)
+    case favoritePhotos
     
     func produceViewController() -> UIViewController {
         switch self {
         case .photoCollection(let viewModel):
             return PhotoCollectionViewController(viewModel: viewModel)
-        case .favoritePhotos(let viewModel):
-            return FavoriteTableViewController(viewModel: viewModel)
+        case .favoritePhotos:
+            return FavoriteTableViewController()
         }
     }
 }

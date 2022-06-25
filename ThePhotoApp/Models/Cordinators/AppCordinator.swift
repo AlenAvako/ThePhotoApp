@@ -35,6 +35,7 @@ final class AppCordinator: Cordinator {
     }
     
     private func initTabBar() {
+        tabBarController.tabBar.tintColor = .black
         tabBarController.viewControllers = viewControllers()
     }
     
@@ -43,8 +44,7 @@ final class AppCordinator: Cordinator {
         let collectionVC = factory.getViewController(for: .photoCollection(viewModel: collectionViewModel))
         let collectionNC = createNavigationController(from: collectionVC, title: TabBarSetUps.photos, image: TabBarSetUps.photoIcon)
         
-        let favoriteViewModel = TableViewModel()
-        let favoriteVC = factory.getViewController(for: .favoritePhotos(viewModel: favoriteViewModel))
+        let favoriteVC = factory.getViewController(for: .favoritePhotos)
         let favoriteNC = createNavigationController(from: favoriteVC, title: TabBarSetUps.favorite, image: TabBarSetUps.favoriteIcon)
         
         return [collectionNC, favoriteNC]

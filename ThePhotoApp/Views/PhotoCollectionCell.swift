@@ -6,15 +6,23 @@
 //
 
 import UIKit
+import SDWebImage
 
 final class PhotoCollectionCell: UICollectionViewCell {
+    
+    var loadedPhoto: PhotoCollection! {
+        didSet {
+            let photoURL = loadedPhoto.urls["small"]
+            guard let searchURL = photoURL, let url = URL(string: searchURL) else { return }
+            photo.sd_setImage(with: url)
+        }
+    }
     
     private lazy var photo: UIImageView = {
         let photo = UIImageView()
         photo.translatesAutoresizingMaskIntoConstraints = false
         photo.clipsToBounds = true
         photo.contentMode = .scaleAspectFill
-        photo.backgroundColor = .blue
         return photo
     }()
     
@@ -26,6 +34,12 @@ final class PhotoCollectionCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        photo.image = nil
     }
     
     private func setUpConstraints() {

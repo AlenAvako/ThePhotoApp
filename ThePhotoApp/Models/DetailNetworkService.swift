@@ -1,31 +1,30 @@
 //
-//  NetworkService.swift
+//  DetailNetworkService.swift
 //  ThePhotoApp
 //
-//  Created by Ален Авако on 23.06.2022.
+//  Created by Ален Авако on 24.06.2022.
 //
 
 import Foundation
 
-final class NetworkService {
-    static let shared = NetworkService()
+class DetailNetworkService {
+    static let shared = DetailNetworkService()
     
-    func request(searchterm: String, completion: @escaping ([PhotoCollection]) -> Void) {
-        guard let url = prepareURL(searchTerm: searchterm) else { return }
+    func request(id: String, completion: @escaping (Photo) -> Void) {
+        guard let url = prepareURL(id: id) else { return }
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = prepareHeaders()
-        print(request)
         let session = URLSession(configuration: .default)
         session.dataTask(with: request) { data, responce, error in
             guard let data = data else { return }
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let responce = try decoder.decode(SerchResult.self, from: data)
-                let photos = responce.results
+                let responce = try decoder.decode(Photo.self, from: data)
+                let photo = responce
                 
                 DispatchQueue.main.async {
-                    completion(photos)
+                    completion(photo)
                 }
             } catch let error {
                 print("Сервер не отвечает: \(error.localizedDescription)")
@@ -39,16 +38,11 @@ final class NetworkService {
         return headers
     }
     
-    private func prepareURL(searchTerm: String) -> URL? {
+    private func prepareURL(id: String) -> URL? {
         var urlComponents = URLComponents()
-        var parameters = [String: String]()
-        parameters["query"] = searchTerm
-        parameters["page"] = String(1)
-        parameters["per_page"] = String(20)
         urlComponents.scheme = "https"
         urlComponents.host = "api.unsplash.com"
-        urlComponents.path = "/search/photos"
-        urlComponents.queryItems = parameters.map { URLQueryItem(name: $0, value: $1) }
+        urlComponents.path = "/photos/\(id)"
         return urlComponents.url
     }
 }

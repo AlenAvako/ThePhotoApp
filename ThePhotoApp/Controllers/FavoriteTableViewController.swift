@@ -13,14 +13,10 @@ class FavoriteTableViewController: UIViewController {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(FavoriteCell.self, forCellReuseIdentifier: String(describing: FavoriteCell.self))
-        tableView.backgroundColor = .cyan
         return tableView
     }()
-
-    private let viewModel: TableViewModel
     
-    init(viewModel: TableViewModel) {
-        self.viewModel = viewModel
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -30,9 +26,15 @@ class FavoriteTableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        view.backgroundColor = .white
         
         setUpTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        favoriteTableView.reloadData()
     }
     
     private func setUpTableView() {
@@ -52,11 +54,13 @@ class FavoriteTableViewController: UIViewController {
 
 extension FavoriteTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return FavoriteArray.favoriteArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = favoriteTableView.dequeueReusableCell(withIdentifier: String(describing: FavoriteCell.self), for: indexPath) as! FavoriteCell
+        
+        cell.loadedPhoto = FavoriteArray.favoriteArray[indexPath.row]
         
         return cell
     }
@@ -65,5 +69,11 @@ extension FavoriteTableViewController: UITableViewDataSource {
 }
 
 extension FavoriteTableViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let id = FavoriteArray.favoriteArray[indexPath.row].id
+        let viewModel = DetailViewModel(id: id)
+        let detailVC = PhotoDetailViewController(viewModel: viewModel)
+        detailVC.modalPresentationStyle = .fullScreen
+        present(detailVC, animated: true)
+    }
 }
